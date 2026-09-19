@@ -1,11 +1,11 @@
 {
-  "name": "Cards Against Humanity",
-  "short_name": "CAH",
-  "description": "The party game for horrible people — play online with friends",
+  "name": "Terrible hooman",
+  "short_name": "Hooman",
+  "description": "The party game for terrible hoomans — play online with friends",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#111111",
-  "theme_color": "#111111",
+  "background_color": "#14120f",
+  "theme_color": "#14120f",
   "orientation": "portrait",
   "icons": [
     {

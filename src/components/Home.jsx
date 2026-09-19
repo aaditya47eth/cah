@@ -1,152 +1,178 @@
-import { useState, useEffect, useMemo } from 'react'
-import multiavatar from '@multiavatar/multiavatar/esm'
+import { useState, useEffect } from 'react'
+import Avatar from './Avatar'
+import Sheet from './Sheet'
+import { loadProfile, saveProfile, randomAvatar } from '../lib/profile'
 
-function randomSeed() {
-  return Math.random().toString(36).substring(2, 10)
+const NAME_MAX = 20
+
+const GAMES = {
+  cah: {
+    title: 'Terrible hooman',
+    blurb: 'Fill in the blank with the worst card you’ve got, then everyone votes.',
+  },
+  dirty: {
+    title: 'Dirty Minds',
+    blurb: 'Five filthy-sounding clues, one totally innocent answer. No points, just shame.',
+  },
 }
 
-function svgToDataUri(svgString) {
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svgString)}`
-}
-
-function AvatarPreview({ seed, size = 80 }) {
-  const svg = multiavatar(seed)
-  return <div style={{ width: size, height: size }} dangerouslySetInnerHTML={{ __html: svg }} />
-}
-
-function getAvatarString(seed) {
-  const svg = multiavatar(seed)
-  return svgToDataUri(svg)
-}
-
-export { AvatarPreview }
-
-export default function Home({ onCreateRoom, onJoinRoom }) {
-  const [name, setName] = useState('')
+export default function Home({ onCreateRoom, onJoinRoom, onPassAndPlay }) {
+  const [profile] = useState(() => loadProfile())
+  const [name, setName] = useState(profile?.name || '')
+  const [avatar, setAvatar] = useState(profile?.avatar || randomAvatar())
+  const [editingName, setEditingName] = useState(!profile?.name)
+  const [joinOpen, setJoinOpen] = useState(false)
+  const [gameSheet, setGameSheet] = useState(null) // 'cah' | 'dirty' | null
+  const [sheetAsksName, setSheetAsksName] = useState(false)
   const [roomCode, setRoomCode] = useState('')
-  const [mode, setMode] = useState(null)
-  const [seed, setSeed] = useState(randomSeed)
 
-  // Check URL for ?room=XXXX
+  const trimmed = name.trim()
+
+  const openJoin = () => {
+    setSheetAsksName(!trimmed)
+    setJoinOpen(true)
+  }
+
+  const openGame = (game) => {
+    setSheetAsksName(!trimmed)
+    setGameSheet(game)
+  }
+
+  // A shared ?room=XXXX link opens the join sheet with the code filled in.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const room = params.get('room')
     if (room) {
-      setRoomCode(room.toUpperCase().slice(0, 4))
-      setMode('join')
+      setRoomCode(room.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4))
+      setSheetAsksName(!profile?.name)
+      setJoinOpen(true)
       window.history.replaceState({}, '', window.location.pathname)
     }
-  }, [])
+  }, [profile])
 
-  const reroll = () => {
-    setSeed(randomSeed())
+  const remember = () => saveProfile({ name: trimmed, avatar })
+
+  const rerollAvatar = () => {
+    const next = randomAvatar(avatar)
+    setAvatar(next)
+    if (trimmed) saveProfile({ name: trimmed, avatar: next })
   }
-
-  const avatar = useMemo(() => getAvatarString(seed), [seed])
 
   const handleCreate = (e) => {
     e.preventDefault()
-    if (name.trim()) onCreateRoom(name.trim(), avatar)
+    if (!trimmed || !gameSheet) return
+    remember()
+    onCreateRoom(gameSheet, trimmed, avatar)
   }
 
   const handleJoin = (e) => {
     e.preventDefault()
-    if (name.trim() && roomCode.trim()) onJoinRoom(roomCode.trim(), name.trim(), avatar)
+    if (!trimmed || roomCode.length < 4) return
+    remember()
+    onJoinRoom(roomCode, trimmed, avatar)
   }
 
+  const nameInput = (autoFocus) => (
+    <input
+      type="text"
+      className="input"
+      placeholder="Your name"
+      aria-label="Your name"
+      value={name}
+      maxLength={NAME_MAX}
+      autoFocus={autoFocus}
+      onChange={(e) => setName(e.target.value)}
+      onKeyDown={(e) => { if (e.key === 'Enter' && trimmed) setEditingName(false) }}
+    />
+  )
+
   return (
-    <div className="home">
-      <div className="home-card">
-        <h1>Cards Against Humanity</h1>
-        <p className="subtitle">The party game for horrible people</p>
+    <div className="screen">
+      <div className="screen-body home">
+        <button type="button" className="avatar-button" onClick={rerollAvatar} aria-label="Change avatar">
+          <Avatar avatar={avatar} name={name} size={84} />
+          <span className="avatar-button-hint">tap to change</span>
+        </button>
 
-        {!mode && (
-          <>
-            <div className="avatar-picker-v2">
-              <div className="avatar-img-wrap" onClick={reroll}>
-                <AvatarPreview seed={seed} size={96} />
-              </div>
-              <div className="avatar-controls">
-                <button type="button" className="btn btn-sm btn-secondary" onClick={reroll}>
-                  &#8635; Reroll
-                </button>
-              </div>
-            </div>
-            <input
-              type="text"
-              placeholder="Your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              maxLength={20}
-              autoFocus
-              className="input"
-            />
-            <div className="home-buttons">
-              <button
-                className="btn btn-primary"
-                onClick={() => name.trim() && setMode('create')}
-                disabled={!name.trim()}
-              >
-                Create Room
-              </button>
-              <button
-                className="btn btn-secondary"
-                onClick={() => name.trim() && setMode('join')}
-                disabled={!name.trim()}
-              >
-                Join Room
-              </button>
-            </div>
-          </>
+        {editingName ? (
+          <div className="welcome">
+            <h1>Hey there 👋</h1>
+            {nameInput(true)}
+          </div>
+        ) : (
+          <div className="welcome">
+            <h1>Welcome back,</h1>
+            <button type="button" className="welcome-name" onClick={() => setEditingName(true)}>
+              {trimmed} <span aria-hidden="true">👋</span>
+            </button>
+          </div>
         )}
 
-        {mode === 'create' && (
-          <form onSubmit={handleCreate}>
-            <div className="avatar-preview-wrap">
-              <AvatarPreview seed={seed} size={64} />
-            </div>
-            <p className="info">
-              Playing as <strong>{name}</strong>
-            </p>
-            <button className="btn btn-primary btn-large" type="submit">
-              Create Room
-            </button>
-            <button className="btn btn-ghost" type="button" onClick={() => setMode(null)}>
-              Back
-            </button>
-          </form>
-        )}
+        <h2 className="section-title">Pick a game</h2>
+        <div className="stack">
+          <button type="button" className="game-tile game-tile-cah" onClick={() => openGame('cah')}>
+            <span className="title-card-art" aria-hidden="true">
+              <span className="mini-card mini-card-back" />
+              <span className="mini-card mini-card-mid" />
+              <span className="mini-card mini-card-front">?!</span>
+            </span>
+            <span className="game-tile-text">
+              <span className="title-card-text">{GAMES.cah.title}</span>
+              <span className="game-tile-sub">Fill in the blank · vote</span>
+            </span>
+          </button>
+          <button type="button" className="game-tile game-tile-dirty" onClick={() => openGame('dirty')}>
+            <span className="title-card-art" aria-hidden="true">
+              <span className="mini-card mini-card-back" />
+              <span className="mini-card mini-card-mid" />
+              <span className="mini-card mini-card-front">😏</span>
+            </span>
+            <span className="game-tile-text">
+              <span className="title-card-text">{GAMES.dirty.title}</span>
+              <span className="game-tile-sub">Dirty clues · clean answers</span>
+            </span>
+          </button>
+        </div>
 
-        {mode === 'join' && (
-          <form onSubmit={handleJoin}>
-            <div className="avatar-preview-wrap">
-              <AvatarPreview seed={seed} size={64} />
-            </div>
-            <p className="info">
-              Playing as <strong>{name}</strong>
-            </p>
-            <input
-              type="text"
-              placeholder="Room code"
-              value={roomCode}
-              onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-              maxLength={4}
-              autoFocus
-              className="input input-code"
-            />
-            <button
-              className="btn btn-primary btn-large"
-              type="submit"
-              disabled={roomCode.trim().length < 4}
-            >
-              Join
-            </button>
-            <button className="btn btn-ghost" type="button" onClick={() => setMode(null)}>
-              Back
-            </button>
-          </form>
-        )}
+        <button className="btn btn-secondary" onClick={openJoin}>
+          Join room with code
+        </button>
       </div>
+
+      <Sheet open={gameSheet !== null} onClose={() => setGameSheet(null)} title={GAMES[gameSheet]?.title}>
+        <p className="muted">{GAMES[gameSheet]?.blurb}</p>
+        <form className="stack" onSubmit={handleCreate}>
+          {sheetAsksName && nameInput(true)}
+          <button className="btn btn-primary" type="submit" disabled={!trimmed}>
+            Create room
+          </button>
+          {gameSheet === 'dirty' && (
+            <button className="btn btn-secondary" type="button" onClick={() => onPassAndPlay('dirty')}>
+              Pass &amp; play on this phone
+            </button>
+          )}
+        </form>
+      </Sheet>
+
+      <Sheet open={joinOpen} onClose={() => setJoinOpen(false)} title="Join a room">
+        <form className="stack" onSubmit={handleJoin}>
+          {sheetAsksName && nameInput(true)}
+          <input
+            type="text"
+            className="input input-code"
+            placeholder="CODE"
+            aria-label="Room code"
+            value={roomCode}
+            maxLength={4}
+            autoFocus={!sheetAsksName}
+            autoCapitalize="characters"
+            onChange={(e) => setRoomCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
+          />
+          <button className="btn btn-primary" type="submit" disabled={!trimmed || roomCode.length < 4}>
+            Join
+          </button>
+        </form>
+      </Sheet>
     </div>
   )
 }
