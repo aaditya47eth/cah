@@ -15,7 +15,7 @@ Append to `cards` in `src/data/dirty-minds.json`:
 {"id": 31, "answer": "Umbrella", "clues": ["clue 1", "clue 2", "clue 3", "clue 4", "clue 5"]}
 ```
 
-Each card needs a unique `id`, an `answer`, and exactly 5 `clues` (dirtiest first, most obvious last). `npm test` checks the format.
+Each card needs a unique `id`, an `answer`, and 3 to 5 `clues` (dirtiest first, most obvious last). `npm test` checks the format.
 
 ## Terrible hooman features
 

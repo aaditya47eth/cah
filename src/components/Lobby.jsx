@@ -92,7 +92,7 @@ export default function Lobby({
         <div className="panel">
           {players.map((p, i) => (
             <div key={p.id} className="row">
-              <Avatar avatar={p.avatar} name={p.name} size={48} />
+              <Avatar avatar={p.avatar} name={p.name} size={40} />
               <span className="row-name">
                 {p.name}
                 {p.id === playerId && <span className="muted"> (you)</span>}
@@ -102,7 +102,7 @@ export default function Lobby({
           ))}
           {Array.from({ length: missing }, (_, i) => (
             <div key={`wait-${i}`} className="row row-waiting">
-              <span className="avatar avatar-empty" style={{ width: 48, height: 48 }} />
+              <span className="avatar avatar-empty" style={{ width: 40, height: 40 }} />
               <span className="row-name">Waiting</span>
               <span className="spinner" aria-hidden="true" />
             </div>

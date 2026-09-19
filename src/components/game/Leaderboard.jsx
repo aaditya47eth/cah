@@ -27,7 +27,7 @@ export default function Leaderboard({ players, myId, prevScores, kickVotes, onKi
               {prevScores && rank > prevRank && <span className="rank-down" aria-label="down">▼</span>}
               {prevScores && rank < prevRank && <span className="rank-up" aria-label="up">▲</span>}
             </span>
-            <Avatar avatar={p.avatar} name={p.name} size={48} />
+            <Avatar avatar={p.avatar} name={p.name} size={40} />
             <span className="row-name">
               {p.name}
               {p.id === myId && <span className="muted"> (you)</span>}
