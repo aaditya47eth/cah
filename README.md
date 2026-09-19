@@ -1,19 +1,39 @@
-# Cards Against Humanity - Online
+# Terrible hooman
 
-A web-based Cards Against Humanity game for up to 12 players. Create a room, share the code, and play on any device.
+A web-based party game hub for up to 12 players. Pick a game, create a room, share the code, and play on any device.
 
-## Features
+## Games
+
+- **Terrible hooman** — fill-in-the-blank (in the style of Cards Against Humanity), everyone votes.
+- **Dirty Minds** — five dirty-sounding clues, one innocent answer. No scoring. Play online (one player per card is the Reader, sees the answer and reveals clues; everyone shouts guesses) or **pass & play** on one phone.
+
+### Adding Dirty Minds cards
+
+Append to `cards` in `src/data/dirty-minds.json`:
+
+```json
+{"id": 31, "answer": "Umbrella", "clues": ["clue 1", "clue 2", "clue 3", "clue 4", "clue 5"]}
+```
+
+Each card needs a unique `id`, an `answer`, and exactly 5 `clues` (dirtiest first, most obvious last). `npm test` checks the format.
+
+## Terrible hooman features
 
 - Real-time multiplayer via Supabase Realtime (no database tables needed)
-- Room codes for easy joining
-- Judge confirms question before showing to players
-- Configurable card refresh limits per round
-- Vote kick (50%+ majority)
+- Room codes and shareable invite links (`?room=CODE`)
+- No judge: everyone plays a card, then everyone votes; the most-voted card scores (ties all score), first to 7 wins
+- 2–12 players
+- Hardcore mode (18+: decks are half normal, half extreme cards)
+- Optional round timer (30/45/60 s) — missing cards are auto-played, missing votes skipped
+- Per-round hand exchanges (swap all 6 cards for new ones)
+- Vote kick (strict majority of the other players)
 - Custom question and answer cards
 - Session persistence on refresh (30s reconnect grace period)
-- Multiavatar avatars
+- Emoji avatars; name and avatar remembered per browser
 - Game history recap
 - PWA support
+
+Run `npm test` for the unit tests (game rules and decks).
 
 ## Prerequisites
 
@@ -143,6 +163,6 @@ Vercel auto-detects Vite. No extra configuration needed.
 
 - React 18 + Vite
 - Supabase Realtime (Broadcast + Presence)
-- Multiavatar for player avatars
-- Web Audio API (removed) / CSS animations
+- CSS animations
+- Vitest for unit tests
 - PWA with service worker
