@@ -90,7 +90,7 @@ export default function Home({ onCreateRoom, onJoinRoom, onPassAndPlay }) {
     <div className="screen">
       <div className="screen-body home">
         <button type="button" className="avatar-button" onClick={rerollAvatar} aria-label="Change avatar">
-          <Avatar avatar={avatar} name={name} size={84} />
+          <Avatar avatar={avatar} name={name} size={64} />
           <span className="avatar-button-hint">tap to change</span>
         </button>
 

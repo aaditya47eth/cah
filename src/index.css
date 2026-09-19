@@ -30,7 +30,7 @@
   --radius-lg: 20px;
   --font: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --mono: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  --gutter: 20px;
+  --gutter: 16px;
   color-scheme: dark;
 }
 
@@ -89,15 +89,15 @@ button:focus-visible, input:focus-visible {
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 20px var(--gutter) 24px;
+  padding: 14px var(--gutter) 18px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .screen-footer {
   flex: none;
-  padding: 12px var(--gutter) calc(16px + env(safe-area-inset-bottom));
+  padding: 10px var(--gutter) calc(12px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -114,17 +114,17 @@ button:focus-visible, input:focus-visible {
 .muted { color: var(--muted); }
 .small { font-size: 14px; }
 .center { text-align: center; }
-.big-emoji { font-size: 64px; }
+.big-emoji { font-size: 52px; }
 
 /* ─── Buttons & inputs ─────────────────────────────────── */
 
 .btn {
   width: 100%;
-  min-height: 58px;
+  min-height: 50px;
   padding: 0 20px;
   border-radius: 999px;
   border: 2px solid transparent;
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 700;
   transition: transform 0.1s, opacity 0.15s;
 }
@@ -136,9 +136,9 @@ button:focus-visible, input:focus-visible {
 
 .btn-small {
   width: auto;
-  min-height: 48px;
+  min-height: 40px;
   padding: 0 18px;
-  font-size: 16px;
+  font-size: 15px;
   background: var(--amber);
   color: var(--ink);
   border-radius: 999px;
@@ -150,14 +150,14 @@ button:focus-visible, input:focus-visible {
   background: none;
   border: 0;
   color: var(--muted);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
-  padding: 10px;
+  padding: 6px;
 }
 
 .icon-btn {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: 0;
   background: var(--surface-3);
@@ -174,33 +174,33 @@ button:focus-visible, input:focus-visible {
   border: 0;
   border-radius: 12px;
   padding: 5px 14px 5px 5px;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--ink);
 }
 .pill:disabled { opacity: 0.45; }
 .pill-pink { background: var(--pink); }
 .pill-count {
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background: var(--maroon);
   color: var(--text);
   display: grid;
   place-items: center;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .input {
   width: 100%;
-  min-height: 58px;
+  min-height: 50px;
   padding: 0 18px;
   border-radius: 14px;
   border: 2px solid transparent;
   background: var(--surface);
   color: var(--text);
   font-family: var(--font);
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 500;
 }
 .input::placeholder { color: #766d61; }
@@ -208,12 +208,12 @@ button:focus-visible, input:focus-visible {
 .input-code {
   text-align: center;
   font-family: var(--mono);
-  font-size: 30px;
+  font-size: 26px;
   letter-spacing: 0.5em;
   padding-left: calc(18px + 0.5em);
   text-transform: uppercase;
 }
-.input-small { min-height: 48px; font-size: 16px; }
+.input-small { min-height: 42px; font-size: 16px; }
 .inline-form { display: flex; gap: 8px; }
 
 .spinner {
@@ -263,26 +263,26 @@ button:focus-visible, input:focus-visible {
 .panel {
   background: var(--surface);
   border-radius: var(--radius-lg);
-  padding: 6px 18px;
+  padding: 4px 14px;
 }
 
 .row {
   display: flex;
   align-items: center;
-  gap: 14px;
-  min-height: 70px;
+  gap: 12px;
+  min-height: 56px;
 }
 
 .row-name {
   flex: 1;
   min-width: 0;
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.row-name .muted { font-weight: 500; font-size: 16px; }
+.row-name .muted { font-weight: 500; font-size: 14px; }
 .row-waiting .row-name { color: var(--muted); }
 
 .badge {
@@ -311,14 +311,14 @@ button:focus-visible, input:focus-visible {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 6px;
-  font-size: 22px;
+  margin-top: 2px;
+  font-size: 18px;
   font-weight: 700;
 }
 
 /* ─── Home ─────────────────────────────────────────────── */
 
-.home { gap: 24px; padding-top: 32px; }
+.home { gap: 16px; padding-top: 20px; }
 
 .avatar-button {
   align-self: flex-start;
@@ -333,14 +333,14 @@ button:focus-visible, input:focus-visible {
 .avatar-button-hint { font-size: 12px; }
 
 .welcome { display: flex; flex-direction: column; gap: 12px; }
-.welcome h1 { font-size: 36px; font-weight: 700; line-height: 1.15; }
+.welcome h1 { font-size: 28px; font-weight: 700; line-height: 1.15; }
 .welcome-name {
   align-self: flex-start;
   background: none;
   border: 0;
   padding: 0;
   color: var(--amber);
-  font-size: 36px;
+  font-size: 28px;
   font-weight: 700;
   text-align: left;
   margin-top: -8px;
@@ -357,7 +357,7 @@ button:focus-visible, input:focus-visible {
   color: var(--ink);
 }
 .title-card-text {
-  font-size: 32px;
+  font-size: 26px;
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.035em;
@@ -385,11 +385,11 @@ button:focus-visible, input:focus-visible {
 
 /* Game picker tiles reuse the title-card art and type. */
 .game-tile {
-  min-height: 132px;
+  min-height: 104px;
   display: flex;
   align-items: center;
-  gap: 20px;
-  padding: 20px 22px;
+  gap: 14px;
+  padding: 14px 18px;
   border: 0;
   border-radius: var(--radius-lg);
   color: var(--ink);
@@ -402,8 +402,8 @@ button:focus-visible, input:focus-visible {
 .game-tile-dirty .mini-card-back { background: var(--orange); }
 .game-tile-dirty .mini-card-mid { background: var(--lavender); }
 .game-tile-text { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-.game-tile .title-card-text { font-size: 28px; }
-.game-tile-sub { font-size: 15px; font-weight: 600; opacity: 0.75; }
+.game-tile .title-card-text { font-size: 23px; }
+.game-tile-sub { font-size: 14px; font-weight: 600; opacity: 0.75; }
 
 /* ─── Lobby ────────────────────────────────────────────── */
 
@@ -418,7 +418,7 @@ button:focus-visible, input:focus-visible {
 }
 .room-code {
   font-family: var(--mono);
-  font-size: 52px;
+  font-size: 40px;
   font-weight: 500;
   letter-spacing: 0.12em;
   color: var(--amber);
@@ -427,10 +427,10 @@ button:focus-visible, input:focus-visible {
 
 .tags { display: flex; flex-wrap: wrap; gap: 8px; }
 .tag {
-  padding: 5px 14px;
+  padding: 4px 12px;
   border-radius: 999px;
   color: var(--ink);
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
 }
 .tag-olive { background: var(--olive); }
@@ -439,15 +439,15 @@ button:focus-visible, input:focus-visible {
 .tag-lavender { background: var(--lavender); }
 .tag-pink { background: var(--pink); }
 
-.info-panel { display: flex; gap: 14px; padding: 18px; }
+.info-panel { display: flex; gap: 14px; padding: 14px; }
 .info-panel > svg { flex: none; }
-.info-title { font-size: 19px; font-weight: 700; margin-bottom: 6px; }
+.info-title { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
 .how-to {
   padding-left: 20px;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font-size: 17px;
+  font-size: 15px;
   line-height: 1.4;
 }
 
@@ -489,18 +489,18 @@ button:focus-visible, input:focus-visible {
   background: var(--line);
   margin-bottom: 6px;
 }
-.sheet-title { font-size: 26px; font-weight: 700; }
+.sheet-title { font-size: 22px; font-weight: 700; }
 
 .setting {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 14px 16px;
+  padding: 10px 14px;
   border-radius: var(--radius);
   background: var(--surface);
 }
 .setting-col { flex-direction: column; align-items: stretch; gap: 10px; }
-.setting-label { flex: 1; font-size: 19px; font-weight: 600; }
+.setting-label { flex: 1; font-size: 17px; font-weight: 600; }
 .setting-icon {
   width: 44px;
   height: 44px;
@@ -540,12 +540,12 @@ button:focus-visible, input:focus-visible {
   flex: 1;
   min-width: 0;
   padding: 0 4px;
-  min-height: 44px;
+  min-height: 38px;
   border-radius: 999px;
   border: 2px solid var(--line);
   background: transparent;
   color: var(--text);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
 }
 .segmented button.active { background: var(--amber); border-color: var(--amber); color: var(--ink); }
@@ -558,40 +558,40 @@ button:focus-visible, input:focus-visible {
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 10px;
-  padding: 16px var(--gutter) 6px;
+  padding: 10px var(--gutter) 4px;
 }
 .topbar-side { display: flex; gap: 12px; }
 .topbar-right { justify-content: flex-end; }
 
 .timer {
-  padding: 8px 18px;
+  padding: 6px 16px;
   border-radius: 999px;
   background: var(--surface-3);
   font-family: var(--mono);
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
 .timer-low { background: var(--red); animation: pulse 1s infinite; }
-.timer-round { font-family: var(--font); font-size: 18px; font-weight: 700; }
+.timer-round { font-family: var(--font); font-size: 16px; font-weight: 700; }
 
-.game-body { gap: 18px; padding-top: 12px; }
+.game-body { gap: 14px; padding-top: 12px; }
 
 .question-card {
   position: relative;
   flex: none;
-  min-height: 210px;
+  min-height: 160px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 22px 24px;
+  padding: 18px 20px;
   border-radius: var(--radius-lg);
   color: var(--ink);
   animation: popIn 0.25s ease-out;
 }
 .question-card.compact { min-height: 0; }
 .question-text {
-  font-size: 25px;
+  font-size: 21px;
   font-weight: 700;
   line-height: 1.3;
   letter-spacing: -0.01em;
@@ -632,7 +632,7 @@ button:focus-visible, input:focus-visible {
   flex-wrap: wrap;
   gap: 10px;
 }
-.phase-title { font-size: 21px; font-weight: 700; }
+.phase-title { font-size: 18px; font-weight: 700; }
 .phase-head .pill { font-size: 16px; }
 .phase-head .pill-count { width: 26px; height: 26px; font-size: 15px; }
 .hint { margin-top: -10px; color: var(--muted); font-size: 15px; }
@@ -640,7 +640,7 @@ button:focus-visible, input:focus-visible {
 /* ─── Card carousel ────────────────────────────────────── */
 
 .carousel {
-  --card-w: min(68vw, 330px);
+  --card-w: min(62vw, 290px);
   flex: none;
   display: flex;
   gap: 14px;
@@ -665,12 +665,12 @@ button:focus-visible, input:focus-visible {
 
 .answer-card {
   position: relative;
-  min-height: 250px;
+  min-height: 200px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   gap: 10px;
-  padding: 22px;
+  padding: 18px;
   border-radius: var(--radius-lg);
   border: 3px solid transparent;
   background: var(--card);
@@ -679,7 +679,7 @@ button:focus-visible, input:focus-visible {
   transition: background 0.25s, border-color 0.15s;
   overflow: hidden;
 }
-.answer-card p { font-size: 22px; font-weight: 500; line-height: 1.3; overflow-wrap: anywhere; }
+.answer-card p { font-size: 19px; font-weight: 500; line-height: 1.3; overflow-wrap: anywhere; }
 .answer-card p + p { border-top: 2px dashed var(--card-line); padding-top: 10px; }
 .answer-card.selected { border-color: var(--maroon); }
 
@@ -728,15 +728,15 @@ button:focus-visible, input:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 18px 20px;
+  padding: 14px 16px;
   border-radius: var(--radius-lg);
   background: var(--surface);
 }
 .result-card.winner { border-top: 12px solid var(--amber); }
 .result-owner { display: flex; align-items: center; gap: 14px; }
 .result-label { color: var(--muted); font-size: 16px; font-weight: 600; }
-.result-name { font-size: 26px; font-weight: 700; }
-.result-answer { font-size: 18px; font-weight: 600; }
+.result-name { font-size: 21px; font-weight: 700; }
+.result-answer { font-size: 16px; font-weight: 600; }
 .result-answer::before { content: '“'; }
 .result-answer::after { content: '”'; }
 
@@ -763,19 +763,19 @@ button:focus-visible, input:focus-visible {
   font-weight: 700;
 }
 
-.leaderboard .row { min-height: 74px; }
+.leaderboard .row { min-height: 58px; }
 .rank {
   width: 40px;
   flex: none;
   display: flex;
   align-items: center;
   gap: 3px;
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 700;
 }
 .rank-down { color: var(--red); font-size: 12px; }
 .rank-up { color: var(--olive); font-size: 12px; }
-.delta { color: var(--olive); font-size: 20px; font-weight: 700; }
+.delta { color: var(--olive); font-size: 17px; font-weight: 700; }
 .score {
   min-width: 56px;
   display: inline-flex;
@@ -783,7 +783,7 @@ button:focus-visible, input:focus-visible {
   justify-content: flex-end;
   gap: 6px;
   color: var(--amber);
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 700;
 }
 .kick-btn {
@@ -800,12 +800,12 @@ button:focus-visible, input:focus-visible {
 
 /* ─── Game over ────────────────────────────────────────── */
 
-.gameover-title { margin-top: 8px; text-align: center; font-size: 40px; font-weight: 800; }
+.gameover-title { margin-top: 8px; text-align: center; font-size: 32px; font-weight: 800; }
 .winner-hero { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .winners { display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; }
 .winner-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.crown { position: relative; z-index: 1; margin-bottom: -14px; font-size: 36px; }
-.winner-name { color: var(--amber); font-size: 26px; font-weight: 700; }
+.crown { position: relative; z-index: 1; margin-bottom: -14px; font-size: 30px; }
+.winner-name { color: var(--amber); font-size: 21px; font-weight: 700; }
 
 .recap { display: flex; flex-direction: column; gap: 10px; }
 .recap-item {
@@ -825,37 +825,37 @@ button:focus-visible, input:focus-visible {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 19px;
+  font-size: 16px;
 }
 
 .clue-card {
   flex: none;
-  padding: 18px 20px;
+  padding: 14px 16px;
   border-radius: var(--radius-lg);
   color: var(--ink);
   animation: popIn 0.25s ease-out;
 }
-.clue-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.clue-list { list-style: none; display: flex; flex-direction: column; gap: 9px; }
 .clue {
   display: flex;
   align-items: baseline;
-  gap: 12px;
-  font-size: 21px;
+  gap: 10px;
+  font-size: 17px;
   font-weight: 700;
   line-height: 1.3;
   overflow-wrap: anywhere;
   animation: popIn 0.25s ease-out;
 }
 .clue-num {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   flex: none;
   border-radius: 50%;
   background: var(--ink);
   color: var(--card);
   display: inline-grid;
   place-items: center;
-  font-size: 15px;
+  font-size: 13px;
   transform: translateY(-2px);
 }
 .clue-locked { opacity: 0.35; font-weight: 600; animation: none; }
@@ -864,22 +864,22 @@ button:focus-visible, input:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 18px 20px;
+  padding: 14px 16px;
   border-radius: var(--radius-lg);
   background: var(--maroon);
   animation: popIn 0.25s ease-out;
 }
-.answer-reveal p { color: var(--amber); font-size: 34px; font-weight: 800; line-height: 1.1; }
+.answer-reveal p { color: var(--amber); font-size: 28px; font-weight: 800; line-height: 1.1; }
 
 .secret-answer {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 14px 18px;
+  padding: 10px 14px;
   border: 2px dashed var(--line);
   border-radius: var(--radius);
   background: var(--surface);
   color: var(--text);
   text-align: left;
 }
-.secret-answer-text { font-size: 24px; font-weight: 700; }
+.secret-answer-text { font-size: 20px; font-weight: 700; }

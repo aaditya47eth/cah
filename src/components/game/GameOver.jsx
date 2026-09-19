@@ -20,7 +20,7 @@ export default function GameOver({ state, onPlayAgain, onLeave }) {
             {winners.map((w) => (
               <div key={w.id} className="winner-item">
                 <span className="crown" aria-hidden="true">👑</span>
-                <Avatar avatar={w.avatar} name={w.name} size={88} />
+                <Avatar avatar={w.avatar} name={w.name} size={72} />
                 <p className="winner-name">{w.name}</p>
               </div>
             ))}

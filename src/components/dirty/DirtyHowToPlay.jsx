@@ -1,7 +1,7 @@
 export default function DirtyHowToPlay({ local = false }) {
   return (
     <ol className="how-to">
-      <li>Every card has 5 filthy-sounding clues for a totally innocent answer.</li>
+      <li>Every card has up to 5 filthy-sounding clues for a totally innocent answer.</li>
       {local ? (
         <li>One person reads the clues out loud, or just pass the phone around.</li>
       ) : (
