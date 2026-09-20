@@ -1,7 +1,7 @@
 import Avatar from '../Avatar'
 import { CheckIcon } from '../icons'
 
-export default function WaitingList({ title, players, myId, isDone }) {
+export default function WaitingList({ title, players, myId, judgeId, isDone }) {
   return (
     <div className="waiting">
       <p className="phase-title">{title}</p>
@@ -12,6 +12,7 @@ export default function WaitingList({ title, players, myId, isDone }) {
             <span className="row-name">
               {p.name}
               {p.id === myId && <span className="muted"> (you)</span>}
+              {p.id === judgeId && <span className="judge-tag" title="Judge">⚖️</span>}
             </span>
             {isDone(p)
               ? <span className="check-dot"><CheckIcon /></span>

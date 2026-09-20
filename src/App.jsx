@@ -9,8 +9,8 @@ import PassAndPlay from './components/dirty/PassAndPlay'
 export default function App() {
   const {
     state, createRoom, joinRoom, updateSettings, startGame, continueGame, playAgain,
-    submitCards, vote, exchangeHand, voteKick, addCustomQuestion, addCustomAnswer, leaveGame,
-    nextClue, revealAnswer, nextCard,
+    submitCards, vote, exchangeHand, voteKick, skipQuestion, addCustomQuestion, addCustomAnswer,
+    leaveGame, nextClue, revealAnswer, nextCard,
   } = useGame()
   const [localGame, setLocalGame] = useState(null) // pass & play needs no room
 
@@ -48,6 +48,7 @@ export default function App() {
         onSubmitCards={submitCards}
         onVote={vote}
         onExchangeHand={exchangeHand}
+        onSkipQuestion={skipQuestion}
         onContinue={continueGame}
         onPlayAgain={playAgain}
         onVoteKick={voteKick}

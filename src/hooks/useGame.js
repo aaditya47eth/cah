@@ -8,6 +8,7 @@ const ENGINES = { cah: cahEngine, dirty: dirtyEngine }
 const engineOf = (hs) => ENGINES[hs?.game] || cahEngine
 
 const RECONNECT_GRACE_MS = 30000
+const ERROR_TOAST_MS = 5000
 
 // ─── Session persistence ────────────────────────────────────────────────
 
@@ -57,6 +58,7 @@ const initialState = {
   result: null,
   kickVotes: {},
   history: [],
+  judgeId: null,
   customCounts: { questions: 0, answers: 0 },
   deadline: null, // local-clock epoch ms
   // Dirty Minds
@@ -76,13 +78,30 @@ export function useGame() {
   const myIdRef = useRef(null)
   const disconnectTimers = useRef(new Map())
   const phaseTimer = useRef(null)
+  const errorTimer = useRef(null)
 
   useEffect(() => {
     return () => {
       if (channelRef.current) supabase.removeChannel(channelRef.current)
       for (const t of disconnectTimers.current.values()) clearTimeout(t)
       clearTimeout(phaseTimer.current)
+      clearTimeout(errorTimer.current)
     }
+  }, [])
+
+  // Errors are transient: realtime retries on its own, so a toast auto-hides
+  // and any successful (re)subscribe clears it immediately.
+  const clearError = useCallback(() => {
+    clearTimeout(errorTimer.current)
+    setState((prev) => (prev.error ? { ...prev, error: null } : prev))
+  }, [])
+
+  const showError = useCallback((message) => {
+    setState((prev) => ({ ...prev, error: message }))
+    clearTimeout(errorTimer.current)
+    errorTimer.current = setTimeout(() => {
+      setState((prev) => (prev.error === message ? { ...prev, error: null } : prev))
+    }, ERROR_TOAST_MS)
   }, [])
 
   // Applies a broadcast payload to local state (used by host and players).
@@ -189,14 +208,15 @@ export function useGame() {
   const subscribe = useCallback((channel, presence, onReady) => {
     channel.subscribe(async (status) => {
       if (status === 'SUBSCRIBED') {
+        clearError()
         await channel.track(presence)
         onReady?.()
       } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-        setState((prev) => ({ ...prev, error: 'Connection problem — check your internet.' }))
+        showError('Connection problem — check your internet.')
       }
     })
     channelRef.current = channel
-  }, [])
+  }, [clearError, showError])
 
   // ─── Restore session after a reload ────────────────────────────
 
@@ -279,6 +299,7 @@ export function useGame() {
   const vote = useCallback((submissionId) => sendAction({ type: 'vote', submissionId }), [sendAction])
   const exchangeHand = useCallback(() => sendAction({ type: 'exchange_hand' }), [sendAction])
   const voteKick = useCallback((targetId) => sendAction({ type: 'vote_kick', targetId }), [sendAction])
+  const skipQuestion = useCallback(() => sendAction({ type: 'skip_question' }), [sendAction])
   const addCustomQuestion = useCallback((text) => sendAction({ type: 'add_custom_question', text }), [sendAction])
   const addCustomAnswer = useCallback((text) => sendAction({ type: 'add_custom_answer', text }), [sendAction])
 
@@ -296,6 +317,7 @@ export function useGame() {
     for (const t of disconnectTimers.current.values()) clearTimeout(t)
     disconnectTimers.current.clear()
     clearTimeout(phaseTimer.current)
+    clearTimeout(errorTimer.current)
     hostRef.current = null
     myIdRef.current = null
     clearSession()
@@ -304,7 +326,7 @@ export function useGame() {
 
   return {
     state, createRoom, joinRoom, updateSettings, startGame, continueGame, playAgain,
-    submitCards, vote, exchangeHand, voteKick, addCustomQuestion, addCustomAnswer, leaveGame,
-    nextClue, revealAnswer, nextCard,
+    submitCards, vote, exchangeHand, voteKick, skipQuestion, addCustomQuestion, addCustomAnswer,
+    leaveGame, nextClue, revealAnswer, nextCard,
   }
 }

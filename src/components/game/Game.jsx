@@ -10,7 +10,8 @@ import HowToPlay from '../HowToPlay'
 import { kickVotesNeeded } from '../../lib/gameLogic'
 
 export default function Game({
-  state, onSubmitCards, onVote, onExchangeHand, onContinue, onPlayAgain, onVoteKick, onLeave,
+  state, onSubmitCards, onVote, onExchangeHand, onSkipQuestion, onContinue, onPlayAgain,
+  onVoteKick, onLeave,
 }) {
   const [sheet, setSheet] = useState(null) // 'help' | 'board' | null
   const { phase, players, playerId, kickVotes } = state
@@ -56,7 +57,14 @@ export default function Game({
         onLeaderboard={() => setSheet('board')}
       />
       {phase === 'picking' && (
-        <PickPhase key={state.round} state={state} me={me} onSubmit={onSubmitCards} onExchange={onExchangeHand} />
+        <PickPhase
+          key={`${state.round}-${state.currentQuestion?.id}`}
+          state={state}
+          me={me}
+          onSubmit={onSubmitCards}
+          onExchange={onExchangeHand}
+          onSkip={onSkipQuestion}
+        />
       )}
       {phase === 'voting' && <VotePhase key={state.round} state={state} me={me} onVote={onVote} />}
       {phase === 'results' && <ResultsPhase state={state} onContinue={onContinue} />}
