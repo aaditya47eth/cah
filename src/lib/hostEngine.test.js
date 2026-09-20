@@ -2,7 +2,8 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import {
   createHostState, addPlayer, removePlayer, updateSettings, startGame,
   submitCards, castVote, exchangeHand, voteKick, addCustomQuestion, addCustomAnswer,
-  progress, onTimeout, advance, publicState, handleAction, PLAYER_ACTIONS, HAND_SIZE, WINNING_SCORE,
+  progress, onTimeout, advance, publicState, handleAction, skipQuestion, currentJudgeId,
+  PLAYER_ACTIONS, HAND_SIZE, WINNING_SCORE,
 } from './hostEngine'
 import { extremeQuestions } from '../data/questions'
 
@@ -253,5 +254,105 @@ describe('handleAction', () => {
 
   it('tags the broadcast with the game', () => {
     expect(publicState(setup(2)).game).toBe('cah')
+  })
+})
+
+describe('judge', () => {
+  it('starts with the host and rotates every round', () => {
+    const hs = setup(3, { timerSec: 0 })
+    startGame(hs)
+    expect(currentJudgeId(hs)).toBe('p1')
+    playAll(hs)
+    for (const p of hs.players) castVote(hs, p.id, hs.submissions.find((s) => s.ownerId !== p.id).id)
+    progress(hs)
+    advance(hs)
+    expect(currentJudgeId(hs)).toBe('p2')
+  })
+
+  it('wraps around the table', () => {
+    const hs = setup(2, { timerSec: 0 })
+    startGame(hs)
+    const seen = []
+    for (let i = 0; i < 3; i++) {
+      seen.push(currentJudgeId(hs))
+      hs.phase = 'results'
+      advance(hs)
+    }
+    expect(seen).toEqual(['p1', 'p2', 'p1'])
+  })
+
+  it('passes the role on when the judge leaves', () => {
+    const hs = setup(3, { timerSec: 0 })
+    startGame(hs)
+    removePlayer(hs, 'p1')
+    expect(currentJudgeId(hs)).toBe('p2')
+  })
+
+  it('still scores by votes, not by judge choice', () => {
+    const hs = setup(3, { timerSec: 0 })
+    startGame(hs)
+    playAll(hs)
+    const target = hs.submissions.find((s) => s.ownerId !== 'p1')
+    for (const p of hs.players) {
+      castVote(hs, p.id, p.id === target.ownerId ? hs.submissions.find((s) => s.ownerId !== p.id).id : target.id)
+    }
+    progress(hs)
+    expect(hs.phase).toBe('results')
+    expect(hs.result.winnerIds).toEqual([target.ownerId])
+  })
+})
+
+describe('skip question', () => {
+  it('only the judge can skip, and only while picking', () => {
+    const hs = setup(3, { timerSec: 0 })
+    startGame(hs)
+    expect(skipQuestion(hs, 'p2')).toBe(false)
+    const first = hs.currentQuestion
+    expect(skipQuestion(hs, 'p1')).toBe(true)
+    expect(hs.currentQuestion).not.toBe(first)
+    hs.phase = 'voting'
+    expect(skipQuestion(hs, 'p1')).toBe(false)
+  })
+
+  it('gives sent cards back and clears submissions', () => {
+    const hs = setup(3, { timerSec: 0 })
+    startGame(hs)
+    const p2 = hs.players.find((p) => p.id === 'p2')
+    const sent = p2.hand.slice(0, hs.currentQuestion.pick).map((c) => c.id)
+    submitCards(hs, 'p2', sent)
+    expect(p2.hand.length).toBe(HAND_SIZE - sent.length)
+    skipQuestion(hs, 'p1')
+    expect(hs.submissions).toEqual([])
+    expect(p2.hand.map((c) => c.id).sort()).toEqual(
+      expect.arrayContaining(sent)
+    )
+    expect(p2.hand).toHaveLength(HAND_SIZE)
+    expect(hs.phase).toBe('picking')
+  })
+
+  it('restarts the pick timer on the new question', () => {
+    vi.useFakeTimers()
+    const start = Date.now()
+    const hs = setup(3, { timerSec: 30 })
+    startGame(hs)
+    expect(hs.deadline).toBe(start + 30_000)
+    vi.setSystemTime(start + 10_000)
+    skipQuestion(hs, 'p1')
+    expect(hs.deadline).toBe(start + 40_000)
+    vi.useRealTimers()
+  })
+
+  it('travels as a player action', () => {
+    const hs = setup(3, { timerSec: 0 })
+    startGame(hs)
+    expect(PLAYER_ACTIONS.has('skip_question')).toBe(true)
+    expect(handleAction(hs, { type: 'skip_question', playerId: 'p2' })).toBe(false)
+    expect(handleAction(hs, { type: 'skip_question', playerId: 'p1' })).toBe(true)
+  })
+
+  it('is broadcast to everyone', () => {
+    const hs = setup(3)
+    startGame(hs)
+    expect(publicState(hs).judgeId).toBe('p1')
   })
 })

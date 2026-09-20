@@ -14,8 +14,33 @@ function Sparkles() {
   )
 }
 
-export default function PickPhase({ state, me, onSubmit, onExchange }) {
-  const { currentQuestion: question, hand, settings, round, players, playerId } = state
+// The judge owns the question: they can swap it for another one at any point
+// during picking. Everyone else just sees whose call it is.
+function JudgeStrip({ isJudge, judge, onSkip }) {
+  if (isJudge) {
+    return (
+      <div className="judge-strip">
+        <span className="judge-note"><span aria-hidden="true">⚖️</span> You&rsquo;re the judge</span>
+        <button className="pill pill-lavender" onClick={onSkip} title="Draw a different question">
+          <span className="pill-count" aria-hidden="true">⤳</span>
+          Skip question
+        </button>
+      </div>
+    )
+  }
+  return (
+    <div className="judge-strip">
+      <span className="judge-note">
+        <span aria-hidden="true">⚖️</span> {judge ? `${judge.name} is judging this round` : 'Judging this round'}
+      </span>
+    </div>
+  )
+}
+
+export default function PickPhase({ state, me, onSubmit, onExchange, onSkip }) {
+  const { currentQuestion: question, hand, settings, round, players, playerId, judgeId } = state
+  const isJudge = playerId === judgeId
+  const judge = players.find((p) => p.id === judgeId)
   const pick = question.pick
   const [active, setActive] = useState(0)
   const [selected, setSelected] = useState([]) // card ids, in blank order (pick > 1)
@@ -41,10 +66,12 @@ export default function PickPhase({ state, me, onSubmit, onExchange }) {
     return (
       <div className="screen-body game-body">
         <QuestionCard question={question} answers={sent} round={round} compact />
+        <JudgeStrip isJudge={isJudge} judge={judge} onSkip={onSkip} />
         <WaitingList
           title="✅ Sent! Waiting for the others…"
           players={players}
           myId={playerId}
+          judgeId={judgeId}
           isDone={(p) => p.submitted}
         />
       </div>
@@ -88,6 +115,7 @@ export default function PickPhase({ state, me, onSubmit, onExchange }) {
     <>
       <div className="screen-body game-body">
         <QuestionCard question={question} answers={preview} round={round} />
+        <JudgeStrip isJudge={isJudge} judge={judge} onSkip={onSkip} />
         <div className="phase-head">
           <span className="phase-title">
             <span aria-hidden="true">🤔</span> {pick > 1 ? `Select ${pick} cards` : 'Select a card'}

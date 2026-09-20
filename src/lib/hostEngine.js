@@ -20,7 +20,7 @@ export const DEFAULT_SETTINGS = { hardcore: false, timerSec: 45, maxExchanges: 2
 // Actions a non-host may send. Host-only actions (start, settings, continue)
 // never travel over the channel.
 export const PLAYER_ACTIONS = new Set([
-  'submit_cards', 'vote', 'exchange_hand', 'vote_kick',
+  'submit_cards', 'vote', 'exchange_hand', 'vote_kick', 'skip_question',
   'add_custom_question', 'add_custom_answer', 'leave',
 ])
 
@@ -41,6 +41,7 @@ export function createHostState(host, settings = DEFAULT_SETTINGS) {
     phase: 'lobby',
     settings: { ...DEFAULT_SETTINGS, ...settings },
     players: [newPlayer(host)],
+    judgeId: host.id, // rotates each round; picks/skips the question, plays as normal
     questionDeck: [],
     answerDeck: [],
     currentQuestion: null,
@@ -83,6 +84,23 @@ function drawQuestion(hs) {
   hs.currentQuestion = hs.questionDeck.pop()
 }
 
+// ─── Judge ──────────────────────────────────────────────────────────────
+
+// The judge of the round. Falls back to the first player when the stored id
+// is gone (they left, or the state predates judges).
+export function currentJudgeId(hs) {
+  if (hs.players.some((p) => p.id === hs.judgeId)) return hs.judgeId
+  return hs.players[0]?.id ?? null
+}
+
+// Next player in seating order, so the role goes round the table.
+function rotateJudge(hs) {
+  const ids = hs.players.map((p) => p.id)
+  if (ids.length === 0) return
+  const i = ids.indexOf(hs.judgeId)
+  hs.judgeId = i === -1 ? ids[0] : ids[(i + 1) % ids.length]
+}
+
 // ─── Phases ─────────────────────────────────────────────────────────────
 
 function phaseSeconds(hs) {
@@ -100,6 +118,7 @@ function enter(hs, phase) {
 }
 
 function startRound(hs) {
+  if (hs.round > 0) rotateJudge(hs)
   hs.round += 1
   hs.submissions = []
   hs.votes = {}
@@ -123,6 +142,7 @@ export function startGame(hs) {
   hs.answerDeck = freshAnswers(hs)
   hs.history = []
   hs.round = 0
+  hs.judgeId = hs.players[0].id
   startRound(hs)
   return true
 }
@@ -222,8 +242,13 @@ export function addPlayer(hs, info) {
 }
 
 export function removePlayer(hs, playerId) {
-  if (!hs.players.some((p) => p.id === playerId)) return false
+  const seat = hs.players.findIndex((p) => p.id === playerId)
+  if (seat === -1) return false
   hs.players = hs.players.filter((p) => p.id !== playerId)
+  // A judge who leaves hands the role to the next player in seating order.
+  if (playerId === hs.judgeId && hs.players.length > 0) {
+    hs.judgeId = hs.players[seat % hs.players.length].id
+  }
   delete hs.kickVotes[playerId]
   for (const t of Object.keys(hs.kickVotes)) {
     hs.kickVotes[t] = hs.kickVotes[t].filter((v) => v !== playerId)
@@ -290,6 +315,22 @@ export function exchangeHand(hs, playerId) {
   return true
 }
 
+// The judge swaps the round's question. Cards already sent go back to their
+// owners' hands, so nobody loses a card to a skip.
+export function skipQuestion(hs, playerId) {
+  if (hs.phase !== 'picking') return false
+  if (playerId !== currentJudgeId(hs)) return false
+
+  for (const sub of hs.submissions) {
+    const owner = hs.players.find((p) => p.id === sub.ownerId)
+    if (owner) owner.hand.push(...sub.cards)
+  }
+  hs.submissions = []
+  drawQuestion(hs)
+  enter(hs, 'picking') // restarts the pick timer on the new question
+  return true
+}
+
 export function updateSettings(hs, patch) {
   if (hs.phase !== 'lobby') return false
   const s = hs.settings
@@ -325,6 +366,7 @@ export function handleAction(hs, action) {
     case 'vote': return castVote(hs, action.playerId, action.submissionId)
     case 'exchange_hand': return exchangeHand(hs, action.playerId)
     case 'vote_kick': return voteKick(hs, action.playerId, action.targetId)
+    case 'skip_question': return skipQuestion(hs, action.playerId)
     case 'add_custom_question': return addCustomQuestion(hs, action.text)
     case 'add_custom_answer': return addCustomAnswer(hs, action.text)
     case 'leave': return removePlayer(hs, action.playerId)
@@ -343,6 +385,7 @@ export function publicState(hs) {
     phase: hs.phase,
     settings: hs.settings,
     round: hs.round,
+    judgeId: currentJudgeId(hs),
     players: hs.players.map((p) => ({
       id: p.id,
       name: p.name,
